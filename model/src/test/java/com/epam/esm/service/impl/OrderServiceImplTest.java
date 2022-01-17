@@ -40,6 +40,7 @@ public class OrderServiceImplTest {
     private CertificateDao certificateDao;
     private UserDao userDao;
     private Validator validator;
+    private Verifier verifier;
     private UserConverter userConverter;
     private CertificateConverter certificateConverter;
     private OrderConverter orderConverter;
@@ -57,12 +58,12 @@ public class OrderServiceImplTest {
         certificateDao = mock(CertificateDao.class);
         userDao = mock(UserDao.class);
         validator = mock(Validator.class);
-        LocaleManager localeManager = mock(LocaleManager.class);
+        verifier = mock(Verifier.class);
         userConverter = mock(UserConverter.class);
         certificateConverter = mock(CertificateConverter.class);
         orderConverter = mock(OrderConverter.class);
-        orderService = new OrderServiceImpl(orderDao, certificateDao, userDao, validator,
-                localeManager, userConverter, certificateConverter, orderConverter);
+        orderService = new OrderServiceImpl(orderDao, certificateDao, userDao, validator, verifier,
+                userConverter, certificateConverter, orderConverter);
 
         List<Order> orderList = new ArrayList<>();
         userDto = new UserDto(5L, "Vlad", "Makarei", "Daetwen", "USER");
@@ -104,8 +105,8 @@ public class OrderServiceImplTest {
     public void createTestTrue() throws ServiceValidationException, ServiceSearchException {
         OrderDto expected = orderDtoTest1;
         doNothing().when(validator).validateId(anyString());
-        when(validator.isUserExist(anyLong())).thenReturn(true);
-        when(validator.isCertificateExist(anyLong())).thenReturn(true);
+        when(verifier.isUserExist(anyLong())).thenReturn(true);
+        when(verifier.isCertificateExist(anyLong())).thenReturn(true);
         when(userDao.findById(anyLong())).thenReturn(Optional.of(user));
         when(userConverter.convertUserToUserDto(any(User.class))).thenReturn(userDto);
         when(certificateDao.findById(anyLong())).thenReturn(Optional.of(certificateTest1));
@@ -113,6 +114,7 @@ public class OrderServiceImplTest {
                 .thenReturn(certificateDtoTest1);
         when(orderConverter.convertOrderDtoToOrder(any(OrderDto.class))).thenReturn(orderTest1);
         when(orderDao.save(any(Order.class))).thenReturn(orderTest1);
+        doNothing().when(validator).validateOrder(any(Order.class));
         OrderDto actual = orderService.create("5", "5");
         assertEquals(expected, actual);
     }
@@ -125,18 +127,20 @@ public class OrderServiceImplTest {
     }
 
     @Test
-    public void createTestFalse2() throws ServiceValidationException {
+    public void createTestFalse2() throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
-        when(validator.isUserExist(anyLong())).thenReturn(false);
+        when(verifier.isUserExist(anyLong())).thenReturn(false);
+        doThrow(ServiceSearchException.class).when(validator).validateOrder(nullable(Order.class));
         assertThrows(ServiceSearchException.class,
                 () -> orderService.create("5", "5"));
     }
 
     @Test
-    public void createTestFalse3() throws ServiceValidationException {
+    public void createTestFalse3() throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
-        when(validator.isUserExist(anyLong())).thenReturn(true);
-        when(validator.isCertificateExist(anyLong())).thenReturn(false);
+        when(verifier.isUserExist(anyLong())).thenReturn(true);
+        when(verifier.isCertificateExist(anyLong())).thenReturn(false);
+        doThrow(ServiceSearchException.class).when(validator).validateOrder(nullable(Order.class));
         assertThrows(ServiceSearchException.class,
                 () -> orderService.create("5", "5"));
     }
@@ -145,6 +149,7 @@ public class OrderServiceImplTest {
     public void findByIdTestTrue() throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(orderDao.findById(anyLong())).thenReturn(Optional.of(orderTest1));
+        doNothing().when(validator).validateOrder(any(Optional.class));
         when(orderConverter.convertOrderToOrderDto(any(Order.class))).thenReturn(orderDtoTest1);
         OrderDto actual = orderService.findById("5");
         assertEquals(orderDtoTest1, actual);
@@ -158,9 +163,10 @@ public class OrderServiceImplTest {
     }
 
     @Test
-    public void findByIdTestFalse2() throws ServiceValidationException {
+    public void findByIdTestFalse2() throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(orderDao.findById(anyLong())).thenReturn(Optional.empty());
+        doThrow(ServiceSearchException.class).when(validator).validateOrder(any(Optional.class));
         assertThrows(ServiceSearchException.class,
                 () -> orderService.findById("6"));
     }

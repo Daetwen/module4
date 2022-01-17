@@ -10,6 +10,7 @@ import com.epam.esm.service.TagService;
 import com.epam.esm.util.LocaleManager;
 import com.epam.esm.util.TagConverter;
 import com.epam.esm.util.Validator;
+import com.epam.esm.util.Verifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -24,14 +25,16 @@ public class TagServiceImpl implements TagService {
 
     private final TagConverter tagConverter;
     private final Validator validator;
+    private final Verifier verifier;
     private final TagDao tagDao;
     private final LocaleManager localeManager;
 
     @Autowired
-    public TagServiceImpl(TagDao tagDao, Validator validator,
+    public TagServiceImpl(TagDao tagDao, Validator validator, Verifier verifier,
                           TagConverter tagConverter, LocaleManager localeManager) {
         this.tagDao = tagDao;
         this.validator = validator;
+        this.verifier = verifier;
         this.tagConverter = tagConverter;
         this.localeManager = localeManager;
     }
@@ -39,17 +42,19 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagDto create(TagDto tagDto) throws ServiceSearchException {
         Tag createdTag = null;
-        if (validator.isValidTag(tagDto)) {
+        if (verifier.isValidTag(tagDto)) {
             createdTag = tagDao.save(tagConverter.convertTagDtoToTag(tagDto));
         }
-        return checkTag(createdTag);
+        validator.validateTag(createdTag);
+        return tagConverter.convertTagToTagDto(createdTag);
     }
 
     @Override
     public TagDto findById(String id) throws ServiceSearchException, ServiceValidationException {
         validator.validateId(id);
         Optional<Tag> result = tagDao.findById(Long.parseLong(id));
-        return checkTag(result);
+        validator.validateTag(result);
+        return tagConverter.convertTagToTagDto(result.get());
     }
 
     @Override
@@ -57,7 +62,8 @@ public class TagServiceImpl implements TagService {
             throws ServiceSearchException, ServiceValidationException {
         validator.validateName(name);
         Optional<Tag> result = tagDao.findByName(name);
-        return checkTag(result);
+        validator.validateTag(result);
+        return tagConverter.convertTagToTagDto(result.get());
     }
 
     @Override
@@ -67,7 +73,8 @@ public class TagServiceImpl implements TagService {
         validator.validatePage(pageSize);
         List<TagDto> tagDtoList = new ArrayList<>();
         if (Integer.parseInt(page) <= getCountOfPages(pageSize)) {
-            for (Tag element : tagDao.findAll(PageRequest.of(Integer.parseInt(page) - 1, Integer.parseInt(pageSize)))) {
+            for (Tag element : tagDao.findAll(
+                    PageRequest.of(Integer.parseInt(page) - 1, Integer.parseInt(pageSize)))) {
                 tagDtoList.add(tagConverter.convertTagToTagDto(element));
             }
         }
@@ -77,33 +84,17 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagDto findMostPopular() throws ServiceSearchException {
         Tag result = tagDao.findMostPopular();
-        return checkTag(result);
+        validator.validateTag(result);
+        return tagConverter.convertTagToTagDto(result);
     }
 
     @Override
     public TagDto deleteById(String id) throws ServiceValidationException, ServiceSearchException {
         validator.validateId(id);
         Optional<Tag> result = tagDao.findById(Long.parseLong(id));
+        validator.validateTag(result);
         tagDao.deleteById(Long.parseLong(id));
-        return checkTag(result);
-    }
-
-    private TagDto checkTag(Optional<Tag> tag) throws ServiceSearchException {
-        if (tag.isPresent()) {
-            return tagConverter.convertTagToTagDto(tag.get());
-        } else {
-            throw new ServiceSearchException(
-                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
-        }
-    }
-
-    private TagDto checkTag(Tag tag) throws ServiceSearchException {
-        if (!Objects.isNull(tag)) {
-            return tagConverter.convertTagToTagDto(tag);
-        } else {
-            throw new ServiceSearchException(
-                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
-        }
+        return tagConverter.convertTagToTagDto(result.get());
     }
 
     private long getCountOfPages(String pageSize) {

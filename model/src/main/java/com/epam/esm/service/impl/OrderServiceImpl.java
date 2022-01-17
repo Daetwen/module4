@@ -1,6 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.constant.LanguagePath;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.UserDao;
@@ -28,20 +27,20 @@ public class OrderServiceImpl implements OrderService {
     private final CertificateDao certificateDao;
     private final UserDao userDao;
     private final Validator validator;
-    private final LocaleManager localeManager;
+    private final Verifier verifier;
     private final UserConverter userConverter;
     private final CertificateConverter certificateConverter;
     private final OrderConverter orderConverter;
 
     @Autowired
     public OrderServiceImpl(OrderDao orderDao, CertificateDao certificateDao, UserDao userDao,
-                            Validator validator, LocaleManager localeManager, UserConverter userConverter,
+                            Validator validator, Verifier verifier, UserConverter userConverter,
                             CertificateConverter certificateConverter, OrderConverter orderConverter) {
         this.orderDao = orderDao;
         this.certificateDao = certificateDao;
         this.userDao = userDao;
         this.validator = validator;
-        this.localeManager = localeManager;
+        this.verifier = verifier;
         this.userConverter = userConverter;
         this.certificateConverter = certificateConverter;
         this.orderConverter = orderConverter;
@@ -53,8 +52,8 @@ public class OrderServiceImpl implements OrderService {
         Order order = null;
         validator.validateId(userId);
         validator.validateId(certificateId);
-        if (validator.isUserExist(Long.parseLong(userId))
-                && validator.isCertificateExist(Long.parseLong(certificateId))) {
+        if (verifier.isUserExist(Long.parseLong(userId))
+                && verifier.isCertificateExist(Long.parseLong(certificateId))) {
             OrderDto orderDto = new OrderDto();
             orderDto.setCreateDate(OffsetDateTime.now());
             orderDto.setUser(userConverter.convertUserToUserDto(userDao.findById(Long.parseLong(userId)).get()));
@@ -63,14 +62,16 @@ public class OrderServiceImpl implements OrderService {
             orderDto.setPrice(certificateDao.findById(Long.parseLong(certificateId)).get().getPrice());
             order = orderDao.save(orderConverter.convertOrderDtoToOrder(orderDto));
         }
-        return checkOrder(order);
+        validator.validateOrder(order);
+        return orderConverter.convertOrderToOrderDto(order);
     }
 
     @Override
     public OrderDto findById(String id) throws ServiceSearchException, ServiceValidationException {
         validator.validateId(id);
         Optional<Order> result = orderDao.findById(Long.parseLong(id));
-        return checkOrder(result);
+        validator.validateOrder(result);
+        return orderConverter.convertOrderToOrderDto(result.get());
     }
 
     @Override
@@ -103,26 +104,6 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return orderDtoList;
-    }
-
-    private OrderDto checkOrder(Optional<Order> order)
-            throws ServiceSearchException {
-        if (order.isPresent()) {
-            return orderConverter.convertOrderToOrderDto(order.get());
-        } else {
-            throw new ServiceSearchException(
-                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
-        }
-    }
-
-    private OrderDto checkOrder(Order order)
-            throws ServiceSearchException {
-        if (!Objects.isNull(order)) {
-            return orderConverter.convertOrderToOrderDto(order);
-        } else {
-            throw new ServiceSearchException(
-                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
-        }
     }
 
     private long getCountOfPages(String pageSize) throws ServiceValidationException {

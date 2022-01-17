@@ -11,23 +11,13 @@ import org.springframework.stereotype.Component;
 public class UserConverter {
 
     public UserDto convertUserToUserDto(User user) {
-        UserDtoBuilder userDtoBuilder = new UserDtoBuilder();
-        userDtoBuilder.setId(user.getId());
-        userDtoBuilder.setName(user.getName());
-        userDtoBuilder.setSurname(user.getSurname());
-        userDtoBuilder.setLogin(user.getLogin());
-        userDtoBuilder.setRole(user.getRole().getName());
+        UserDtoBuilder userDtoBuilder = setCommonUserDtoBuilderParameters(user);
         return userDtoBuilder.build();
     }
 
     public UserDto convertUserToUserDtoWithPassword(User user) {
-        UserDtoBuilder userDtoBuilder = new UserDtoBuilder();
-        userDtoBuilder.setId(user.getId());
-        userDtoBuilder.setName(user.getName());
-        userDtoBuilder.setSurname(user.getSurname());
-        userDtoBuilder.setLogin(user.getLogin());
+        UserDtoBuilder userDtoBuilder = setCommonUserDtoBuilderParameters(user);
         userDtoBuilder.setPassword(user.getPassword());
-        userDtoBuilder.setRole(user.getRole().getName());
         return userDtoBuilder.build();
     }
 
@@ -40,5 +30,15 @@ public class UserConverter {
         userBuilder.setPassword(userDto.getPassword());
         userBuilder.setRole(new Role(userDto.getRole()));
         return userBuilder.build();
+    }
+
+    private UserDtoBuilder setCommonUserDtoBuilderParameters(User user) {
+        UserDtoBuilder userDtoBuilder = new UserDtoBuilder();
+        userDtoBuilder.setId(user.getId());
+        userDtoBuilder.setName(user.getName());
+        userDtoBuilder.setSurname(user.getSurname());
+        userDtoBuilder.setLogin(user.getLogin());
+        userDtoBuilder.setRole(user.getRole().getName());
+        return userDtoBuilder;
     }
 }

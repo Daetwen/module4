@@ -11,10 +11,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceSearchException;
 import com.epam.esm.exception.ServiceValidationException;
 import com.epam.esm.service.CertificateService;
-import com.epam.esm.util.CertificateConverter;
-import com.epam.esm.util.LocaleManager;
-import com.epam.esm.util.TagConverter;
-import com.epam.esm.util.Validator;
+import com.epam.esm.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -34,6 +31,7 @@ public class CertificateServiceImplTest {
 
     private CertificateService certificateService;
     private Validator validator;
+    private Verifier verifier;
     private CertificateDao certificateDao;
     private CertificateConverter certificateConverter;
     private CertificateDto certificateDtoTest1;
@@ -42,13 +40,13 @@ public class CertificateServiceImplTest {
     @BeforeEach
     public void setUp() {
         validator = mock(Validator.class);
-        LocaleManager localeManager = mock(LocaleManager.class);
+        verifier = mock(Verifier.class);
         certificateDao = mock(CertificateDao.class);
         TagDao tagDao = mock(TagDao.class);
         certificateConverter = mock(CertificateConverter.class);
         TagConverter tagConverter = mock(TagConverter.class);
-        certificateService = new CertificateServiceImpl(certificateDao, tagDao, validator,
-                localeManager, certificateConverter, tagConverter);
+        certificateService = new CertificateServiceImpl(certificateDao, tagDao, validator, verifier,
+                certificateConverter, tagConverter);
 
         Tag tagTest1 = new Tag(5L, "New Year");
         TagDto tagDtoTest1 = new TagDto(5L, "New Year");
@@ -83,10 +81,11 @@ public class CertificateServiceImplTest {
     @Test
     public void createTestTrue() throws ServiceSearchException {
         CertificateDto expected = certificateDtoTest1;
-        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
+        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
         when(certificateConverter.convertCertificateDtoToCertificate(any(CertificateDto.class)))
                 .thenReturn(certificateTest1);
         when(certificateDao.save(any(Certificate.class))).thenReturn(certificateTest1);
+        doNothing().when(validator).validateCertificate(any(Certificate.class));
         when(certificateConverter.convertCertificateToCertificateDto(any(Certificate.class)))
                 .thenReturn(certificateDtoTest1);
         CertificateDto actual = certificateService.create(certificateDtoTest1);
@@ -94,16 +93,18 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void createTestFalse1() {
-        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(false);
+    public void createTestFalse1() throws ServiceSearchException {
+        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(false);
+        doThrow(ServiceSearchException.class).when(validator).validateCertificate(nullable(Certificate.class));
         assertThrows(ServiceSearchException.class,
                 () -> certificateService.create(certificateDtoTest1));
     }
 
     @Test
-    public void createTestFalse2() {
-        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
+    public void createTestFalse2() throws ServiceSearchException {
+        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
         when(certificateDao.save(any(Certificate.class))).thenReturn(null);
+        doThrow(ServiceSearchException.class).when(validator).validateCertificate(nullable(Certificate.class));
         assertThrows(ServiceSearchException.class,
                 () -> certificateService.create(certificateDtoTest1));
     }
@@ -113,6 +114,7 @@ public class CertificateServiceImplTest {
         CertificateDto expected = certificateDtoTest1;
         doNothing().when(validator).validateId(anyString());
         when(certificateDao.findById(anyLong())).thenReturn(Optional.of(certificateTest1));
+        doNothing().when(validator).validateCertificate(any(Certificate.class));
         when(certificateConverter.convertCertificateToCertificateDto(any(Certificate.class)))
                 .thenReturn(certificateDtoTest1);
         CertificateDto actual = certificateService.findById("5");
@@ -127,9 +129,10 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void findByIdTestFalse2() throws ServiceValidationException {
+    public void findByIdTestFalse2() throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(certificateDao.findById(anyLong())).thenReturn(Optional.empty());
+        doThrow(ServiceSearchException.class).when(validator).validateCertificate(any(Optional.class));
         assertThrows(ServiceSearchException.class,
                 () -> certificateService.findById("5"));
     }
@@ -151,9 +154,10 @@ public class CertificateServiceImplTest {
     @Test
     public void updateTestTrue() throws ServiceSearchException {
         CertificateDto expected = certificateDtoTest1;
-        when(validator.isValidCertificateDto(any(CertificateDto.class))).thenReturn(true);
+        when(verifier.isValidCertificateDto(any(CertificateDto.class))).thenReturn(true);
         when(certificateDao.findById(anyLong())).thenReturn(Optional.of(certificateTest1));
         when(certificateDao.save(any(Certificate.class))).thenReturn(certificateTest1);
+        doNothing().when(validator).validateCertificate(any(Certificate.class));
         when(certificateConverter.convertCertificateToCertificateDto(any(Certificate.class)))
                 .thenReturn(certificateDtoTest1);
         CertificateDto actual = certificateService.update(certificateDtoTest1);
@@ -161,25 +165,28 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void updateTestFalse1() {
-        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(false);
+    public void updateTestFalse1() throws ServiceSearchException {
+        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(false);
+        doThrow(ServiceSearchException.class).when(validator).validateCertificate(any(Optional.class));
         assertThrows(ServiceSearchException.class,
                 () -> certificateService.update(certificateDtoTest1));
     }
 
     @Test
-    public void updateTestFalse2() {
-        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
-        when(certificateDao.findById(anyLong())).thenReturn(null);
+    public void updateTestFalse2() throws ServiceSearchException {
+        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
+        when(certificateDao.findById(anyLong())).thenReturn(Optional.empty());
+        doThrow(ServiceSearchException.class).when(validator).validateCertificate(any(Optional.class));
         assertThrows(ServiceSearchException.class,
                 () -> certificateService.update(certificateDtoTest1));
     }
 
     @Test
-    public void updateTestFalse3() {
-        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
+    public void updateTestFalse3() throws ServiceSearchException {
+        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
         when(certificateDao.findById(anyLong())).thenReturn(Optional.of(certificateTest1));
         when(certificateDao.save(any(Certificate.class))).thenReturn(null);
+        doThrow(ServiceSearchException.class).when(validator).validateCertificate(any(Optional.class));
         assertThrows(ServiceSearchException.class,
                 () -> certificateService.update(certificateDtoTest1));
     }
@@ -189,6 +196,7 @@ public class CertificateServiceImplTest {
         CertificateDto expected = certificateDtoTest1;
         doNothing().when(validator).validateId(anyString());
         when(certificateDao.findById(anyLong())).thenReturn(Optional.of(certificateTest1));
+        doNothing().when(validator).validateCertificate(any(Optional.class));
         doNothing().when(certificateDao).deleteById(anyLong());
         when(certificateConverter.convertCertificateToCertificateDto(any(Certificate.class)))
                 .thenReturn(certificateDtoTest1);
@@ -204,9 +212,10 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void deleteByIdTestFalse2() throws ServiceValidationException {
+    public void deleteByIdTestFalse2() throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(certificateDao.findById(anyLong())).thenReturn(Optional.empty());
+        doThrow(ServiceSearchException.class).when(validator).validateCertificate(any(Optional.class));
         doNothing().when(certificateDao).deleteById(anyLong());
         assertThrows(ServiceSearchException.class,
                 () -> certificateService.deleteById("5"));

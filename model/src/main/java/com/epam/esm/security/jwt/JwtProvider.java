@@ -30,7 +30,6 @@ public class JwtProvider {
                 .setExpiration(date)
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
-
     }
 
     public boolean validateToken(String token) {

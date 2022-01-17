@@ -1,35 +1,32 @@
 package com.epam.esm.util;
 
 import com.epam.esm.constant.LanguagePath;
-import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.CertificateDto;
-import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
+import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Order;
+import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.User;
+import com.epam.esm.exception.ServiceSearchException;
 import com.epam.esm.exception.ServiceValidationException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 public class Validator {
     private static final String ID_REGEX = "\\d+";
     private static final String NAME_REGEX = "[\\w !?,.]{0,45}";
-    private static final String DESCRIPTION_REGEX = "[\\w ,.!?\\-\\d]{0,1000}";
-    private static final String ROLE_USER = "USER";
-    private static final String ROLE_ADMIN = "ADMIN";
 
     private final LocaleManager localeManager;
-    private final UserDao userDao;
-    private final CertificateDao certificateDao;
+    private final Encoder passwordEncoder;
 
     @Autowired
-    public Validator(LocaleManager localeManager, UserDao userDao, CertificateDao certificateDao) {
+    public Validator(LocaleManager localeManager, Encoder passwordEncoder) {
         this.localeManager = localeManager;
-        this.userDao = userDao;
-        this.certificateDao = certificateDao;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void validateId(String id) throws ServiceValidationException {
@@ -55,66 +52,85 @@ public class Validator {
         validateName(login);
     }
 
-    public boolean isValidId(Long id) {
-        boolean result = false;
-        if (id != null && id >= 1L) {
-            result = true;
+    public void validateCertificate(Optional<Certificate> certificate)
+            throws ServiceSearchException {
+        if (!certificate.isPresent()) {
+            throw new ServiceSearchException(
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
         }
-        return result;
     }
 
-    public boolean isValidName(String name) {
-        return StringUtils.isNotBlank(name) && name.matches(NAME_REGEX);
+    public void validateCertificate(Certificate certificate)
+            throws ServiceSearchException {
+        if (Objects.isNull(certificate)) {
+            throw new ServiceSearchException(
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
+        }
     }
 
-    public boolean isValidDescription(String description) {
-        return description == null ||
-                (StringUtils.isNotBlank(description) && description.matches(DESCRIPTION_REGEX));
+    public void validateOrder(Optional<Order> order)
+            throws ServiceSearchException {
+        if (!order.isPresent()) {
+            throw new ServiceSearchException(
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
+        }
     }
 
-    public boolean isValidPrice(BigDecimal price) {
-        return price.compareTo(BigDecimal.ZERO) >= 0;
+    public void validateOrder(Order order)
+            throws ServiceSearchException {
+        if (Objects.isNull(order)) {
+            throw new ServiceSearchException(
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
+        }
     }
 
-    public boolean isValidDuration(int duration) {
-        return duration >= 0;
+    public void validateTag(Optional<Tag> tag) throws ServiceSearchException {
+        if (!tag.isPresent()) {
+            throw new ServiceSearchException(
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
+        }
     }
 
-    public boolean isValidRole(String role) {
-        return role.equalsIgnoreCase(ROLE_USER) || role.equalsIgnoreCase(ROLE_ADMIN);
+    public void validateTag(Tag tag) throws ServiceSearchException {
+        if (Objects.isNull(tag)) {
+            throw new ServiceSearchException(
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
+        }
     }
 
-    public boolean isValidCertificate(CertificateDto certificateDto) {
-        return isValidName(certificateDto.getName()) &&
-                isValidDescription(certificateDto.getDescription()) &&
-                isValidPrice(certificateDto.getPrice()) &&
-                isValidDuration(certificateDto.getDuration());
+    public void validateUser(User user, String errorMessage)
+            throws ServiceSearchException {
+        if (Objects.isNull(user)) {
+            throw new ServiceSearchException(localeManager.getLocalizedMessage(errorMessage));
+        }
     }
 
-    public boolean isValidCertificateDto(CertificateDto certificateDto) {
-        return isValidId(certificateDto.getId()) &&
-                (certificateDto.getName() == null || isValidName(certificateDto.getName())) &&
-                isValidDescription(certificateDto.getDescription()) &&
-                (certificateDto.getPrice() == null || isValidPrice(certificateDto.getPrice())) &&
-                (certificateDto.getDuration() == null || isValidDuration(certificateDto.getDuration()));
+    public void validateUser(Optional<User> user, String errorMessage)
+            throws ServiceSearchException {
+        if (!user.isPresent()) {
+            throw new ServiceSearchException(
+                    localeManager.getLocalizedMessage(errorMessage));
+        }
     }
 
-    public boolean isValidTag(TagDto tagDto) {
-        return isValidName(tagDto.getName());
+    public void validateUser(User user, String password, String errorMessage)
+            throws ServiceSearchException {
+        if (!Objects.isNull(user)) {
+            if (!passwordEncoder.passwordEncoder().matches(password, user.getPassword())) {
+                throw new ServiceSearchException(
+                        localeManager.getLocalizedMessage(errorMessage));
+            }
+        } else {
+            throw new ServiceSearchException(
+                    localeManager.getLocalizedMessage(errorMessage));
+        }
     }
 
-    public boolean isValidUser(UserDto userDto) {
-        return isValidName(userDto.getName()) &&
-                isValidName(userDto.getSurname()) &&
-                isValidRole(userDto.getRole());
-    }
-
-    public boolean isUserExist(Long id) {
-        return userDao.findById(id).isPresent();
-    }
-
-    public boolean isCertificateExist(Long id) {
-        return certificateDao.findById(id).isPresent();
+    public void validateUserWithPassword(User user, String errorMessage)
+            throws ServiceSearchException {
+        if (Objects.isNull(user)) {
+            throw new ServiceSearchException(localeManager.getLocalizedMessage(errorMessage));
+        }
     }
 
     private void validateLongNumberFromString(String number) throws ServiceValidationException {

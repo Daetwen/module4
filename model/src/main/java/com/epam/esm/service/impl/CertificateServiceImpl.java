@@ -1,6 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.constant.LanguagePath;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.CertificateDto;
@@ -27,20 +26,20 @@ public class CertificateServiceImpl implements CertificateService {
     private static final String SORT_PARAMETER = "name";
 
     private final Validator validator;
+    private final Verifier verifier;
     private final CertificateDao certificateDao;
     private final TagDao tagDao;
-    private final LocaleManager localeManager;
     private final CertificateConverter certificateConverter;
     private final TagConverter tagConverter;
 
     @Autowired
     public CertificateServiceImpl(CertificateDao certificateDao, TagDao tagDao, Validator validator,
-                                  LocaleManager localeManager, CertificateConverter certificateConverter,
+                                  Verifier verifier, CertificateConverter certificateConverter,
                                   TagConverter tagConverter) {
         this.certificateDao = certificateDao;
         this.tagDao = tagDao;
         this.validator = validator;
-        this.localeManager = localeManager;
+        this.verifier = verifier;
         this.certificateConverter = certificateConverter;
         this.tagConverter = tagConverter;
     }
@@ -48,20 +47,28 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public CertificateDto create(CertificateDto certificateDto) throws ServiceSearchException {
         Certificate certificate = null;
-        if (validator.isValidCertificate(certificateDto)) {
+        if (verifier.isValidCertificate(certificateDto)) {
             certificateDto.setCreateDate(OffsetDateTime.now());
             certificateDto.setLastUpdateDate(OffsetDateTime.now());
             certificate = certificateDao.save(
                     certificateConverter.convertCertificateDtoToCertificate(certificateDto));
         }
-        return checkCertificate(certificate);
+        validator.validateCertificate(certificate);
+        CertificateDto result =
+                certificateConverter.convertCertificateToCertificateDto(certificate);
+        appendTagsForOne(result);
+        return result;
     }
 
     @Override
     public CertificateDto findById(String id) throws ServiceSearchException, ServiceValidationException {
         validator.validateId(id);
         Optional<Certificate> result = certificateDao.findById(Long.parseLong(id));
-        return checkCertificate(result);
+        validator.validateCertificate(result);
+        CertificateDto certificateDto =
+                certificateConverter.convertCertificateToCertificateDto(result.get());
+        appendTagsForOne(certificateDto);
+        return certificateDto;
     }
 
     @Override
@@ -97,20 +104,23 @@ public class CertificateServiceImpl implements CertificateService {
                 certificateDtoList.add(certificateConverter.convertCertificateToCertificateDto(element));
             }
         }
-
         return appendTags(certificateDtoList);
     }
 
     @Override
     public CertificateDto update(CertificateDto certificateDto) throws ServiceSearchException {
         Optional<Certificate> certificate = Optional.empty();
-        if (validator.isValidCertificateDto(certificateDto)
+        if (verifier.isValidCertificateDto(certificateDto)
                 && certificateDao.findById(certificateDto.getId()).isPresent()) {
             certificate = certificateDao.findById(certificateDto.getId());
             certificate = Optional.of(
                     certificateDao.save(createCertificateForUpdate(certificate.get(), certificateDto)));
         }
-        return checkCertificate(certificate);
+        validator.validateCertificate(certificate);
+        CertificateDto result =
+                certificateConverter.convertCertificateToCertificateDto(certificate.get());
+        appendTagsForOne(result);
+        return result;
     }
 
     @Override
@@ -118,8 +128,12 @@ public class CertificateServiceImpl implements CertificateService {
             throws ServiceValidationException, ServiceSearchException {
         validator.validateId(id);
         Optional<Certificate> result = certificateDao.findById(Long.parseLong(id));
+        validator.validateCertificate(result);
         certificateDao.deleteById(Long.parseLong(id));
-        return checkCertificate(result);
+        CertificateDto certificateDto =
+                certificateConverter.convertCertificateToCertificateDto(result.get());
+        appendTagsForOne(certificateDto);
+        return certificateDto;
     }
 
     private long getCountOfPages(String pageSize) {
@@ -127,32 +141,6 @@ public class CertificateServiceImpl implements CertificateService {
         int size = Integer.parseInt(pageSize);
         long countPages = countOfRecords % size == 0 ? countOfRecords / size : countOfRecords / size + 1;
         return countPages == 0 ? 1 : countPages;
-    }
-
-    private CertificateDto checkCertificate(Optional<Certificate> certificate)
-            throws ServiceSearchException {
-        if (certificate.isPresent()) {
-            CertificateDto certificateDto =
-                    certificateConverter.convertCertificateToCertificateDto(certificate.get());
-            appendTagsForOne(certificateDto);
-            return certificateDto;
-        } else {
-            throw new ServiceSearchException(
-                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
-        }
-    }
-
-    private CertificateDto checkCertificate(Certificate certificate)
-            throws ServiceSearchException {
-        if (!Objects.isNull(certificate)) {
-            CertificateDto certificateDto =
-                    certificateConverter.convertCertificateToCertificateDto(certificate);
-            appendTagsForOne(certificateDto);
-            return certificateDto;
-        } else {
-            throw new ServiceSearchException(
-                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
-        }
     }
 
     private List<CertificateDto> appendTags(List<CertificateDto> certificateDtoList) {
@@ -173,16 +161,16 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     private Certificate createCertificateForUpdate(Certificate certificate, CertificateDto certificateDto) {
-        if (validator.isValidName(certificateDto.getName())) {
+        if (verifier.isValidName(certificateDto.getName())) {
             certificate.setName(certificateDto.getName());
         }
-        if (validator.isValidDescription(certificateDto.getDescription())) {
+        if (verifier.isValidDescription(certificateDto.getDescription())) {
             certificate.setDescription(certificateDto.getDescription());
         }
-        if (certificateDto.getPrice() != null && validator.isValidPrice(certificateDto.getPrice())) {
+        if (certificateDto.getPrice() != null && verifier.isValidPrice(certificateDto.getPrice())) {
             certificate.setPrice(certificateDto.getPrice());
         }
-        if (certificateDto.getDuration() != null && validator.isValidDuration(certificateDto.getDuration())) {
+        if (certificateDto.getDuration() != null && verifier.isValidDuration(certificateDto.getDuration())) {
             certificate.setDuration(certificateDto.getDuration());
         }
         certificate.setLastUpdateDate(OffsetDateTime.now());
@@ -192,7 +180,7 @@ public class CertificateServiceImpl implements CertificateService {
     private List<String> createTagListForSearchByParameters(Map<String, String> parameters) {
         List<String> tagList = new ArrayList<>();
         int countOfTags = 0;
-        while (true) {
+        while (countOfTags < parameters.size()) {
             if (parameters.containsKey(ParameterName.TAG_NAME.name() + DELIMITER + countOfTags)) {
                 tagList.add(parameters.get(ParameterName.TAG_NAME.name() + DELIMITER + countOfTags));
             } else {
