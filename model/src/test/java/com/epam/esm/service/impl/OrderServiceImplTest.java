@@ -120,14 +120,14 @@ public class OrderServiceImplTest {
     }
 
     @Test
-    public void createTestFalse1() throws ServiceValidationException {
+    public void createTestFalseIfIdNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validateId(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> orderService.create("5gf", "5"));
     }
 
     @Test
-    public void createTestFalse2() throws ServiceValidationException, ServiceSearchException {
+    public void createTestFalseIfUserNotFound() throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(verifier.isUserExist(anyLong())).thenReturn(false);
         doThrow(ServiceSearchException.class).when(validator).validateOrder(nullable(Order.class));
@@ -136,7 +136,8 @@ public class OrderServiceImplTest {
     }
 
     @Test
-    public void createTestFalse3() throws ServiceValidationException, ServiceSearchException {
+    public void createTestFalseIfOrderNotCreate()
+            throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(verifier.isUserExist(anyLong())).thenReturn(true);
         when(verifier.isCertificateExist(anyLong())).thenReturn(false);
@@ -156,14 +157,15 @@ public class OrderServiceImplTest {
     }
 
     @Test
-    public void findByIdTestFalse1() throws ServiceValidationException {
+    public void findByIdTestFalseIfIdNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validateId(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> orderService.findById("f5g"));
     }
 
     @Test
-    public void findByIdTestFalse2() throws ServiceValidationException, ServiceSearchException {
+    public void findByIdTestFalseIfCertificateNotFound()
+            throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(orderDao.findById(anyLong())).thenReturn(Optional.empty());
         doThrow(ServiceSearchException.class).when(validator).validateOrder(any(Optional.class));
@@ -186,7 +188,7 @@ public class OrderServiceImplTest {
     }
 
     @Test
-    public void findAllTestFalse1() throws ServiceValidationException {
+    public void findAllTestFalseIfPageNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validatePage(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> orderService.findAll("1", "10"));

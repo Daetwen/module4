@@ -20,116 +20,116 @@ public class ValidatorTest {
     }
 
     @Test
-    public void ValidateIdTestFalse1() {
+    public void ValidateIdTestFalseIfIdTooLong() {
         String id = "1231231444444322343242324979876767687687687686768768768768767686876876876868768768";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateId(id));
     }
 
     @Test
-    public void ValidateIdTestFalse2() {
+    public void ValidateIdTestFalseIfIdContainsLetters() {
         String id = "1t23fge12";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateId(id));
     }
 
     @Test
-    public void ValidateIdTestFalse3() {
+    public void ValidateIdTestFalseIfIdIsNull() {
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateId((String) null));
     }
 
     @Test
-    public void ValidateIdTestFalse4() {
+    public void ValidateIdTestFalseIfIdIsEmpty() {
         String id = "";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateId(id));
     }
 
     @Test
-    public void ValidateIdTestFalse5() {
+    public void ValidateIdTestFalseIfIdContainsOnlySpaces() {
         String id = "   ";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateId(id));
     }
 
     @Test
-    public void ValidateIdTestFalse6() {
+    public void ValidateIdTestFalseIfIdNegativeNumber() {
         Long id = -5L;
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateId(id));
     }
 
     @Test
-    public void validatePageTestFalse1() {
+    public void validatePageTestFalseIfPageTooLong() {
         String page = "1231231444444322343242324979876767687687687686768768768768767686876876876868768768";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validatePage(page));
     }
 
     @Test
-    public void validatePageTestFalse2() {
+    public void validatePageTestFalseIfPageNumberContainsLetters() {
         String page = "1t23fge12";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validatePage(page));
     }
 
     @Test
-    public void validatePageTestFalse3() {
+    public void validatePageTestFalseIfPageIsNull() {
         assertThrows(ServiceValidationException.class,
                 () -> validator.validatePage(null));
     }
 
     @Test
-    public void validatePageTestFalse4() {
+    public void validatePageTestFalseIfPageNumberIsEmpty() {
         String page = "";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validatePage(page));
     }
 
     @Test
-    public void validatePageTestFalse5() {
+    public void validatePageTestFalseIfPageNumberContainsOnlySpaces() {
         String page = "   ";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validatePage(page));
     }
 
     @Test
-    public void validatePageTestFalse6() {
+    public void validatePageTestFalseIfPageNegativeNumber() {
         String page = "-5";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validatePage(page));
     }
 
     @Test
-    public void validatePageTestFalse7() {
+    public void validatePageTestFalseIfPageNumberIs0() {
         String page = "0";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validatePage(page));
     }
 
     @Test
-    public void ValidateNameTestFalse1() {
+    public void ValidateNameTestFalseIfNameIsEmpty() {
         String name = "";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateName(name));
     }
 
     @Test
-    public void ValidateNameTestFalse2() {
+    public void ValidateNameTestFalseIfNameContainsOnlySpaces() {
         String name = "   ";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateName(name));
     }
 
     @Test
-    public void ValidateNameTestFalse3() {
+    public void ValidateNameTestFalseIfNameIsNull() {
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateName(null));
     }
 
     @Test
-    public void ValidateNameTestFalse4() {
+    public void ValidateNameTestFalseIfNameTooLong() {
         String name = "gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateName(name));

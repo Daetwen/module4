@@ -57,7 +57,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void registerTestFalse1() throws ServiceSearchException {
+    public void registerTestFalseIfUserNotValid() throws ServiceSearchException {
         when(verifier.isValidUser(any(UserDto.class))).thenReturn(false);
         doThrow(ServiceSearchException.class).when(validator).validateUser(nullable(User.class), anyString());
         assertThrows(ServiceSearchException.class,
@@ -65,7 +65,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void registerTestFalse2() throws ServiceSearchException {
+    public void registerTestFalseIfUserNotCreate() throws ServiceSearchException {
         when(verifier.isValidUser(any(UserDto.class))).thenReturn(true);
         when(encoder.passwordEncoder()).thenReturn(passwordEncoder);
         when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
@@ -80,20 +80,21 @@ public class UserServiceImplTest {
         doNothing().when(validator).validateLogin(anyString());
         when(userDao.findByLogin(anyString())).thenReturn(userTest1);
         doNothing().when(validator).validateUserWithPassword(any(User.class), anyString());
-        when(userConverter.convertUserToUserDto(any(User.class))).thenReturn(userDtoTest1);
+        when(userConverter.convertUserToUserDtoWithPassword(any(User.class))).thenReturn(userDtoTest1);
         UserDto actual = userService.findByLogin("Daetwen");
         assertEquals(userDtoTest1, actual);
     }
 
     @Test
-    public void findByLoginTestFalse1() throws ServiceValidationException {
+    public void findByLoginTestFalseIfLoginNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validateLogin(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> userService.findByLogin("f5g65&*&$#@@@@@"));
     }
 
     @Test
-    public void findByLoginTestFalse2() throws ServiceValidationException, ServiceSearchException {
+    public void findByLoginTestFalseIfUserNotFound()
+            throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateLogin(anyString());
         when(userDao.findByLogin(anyString())).thenReturn(null);
         doThrow(ServiceSearchException.class).when(validator)
@@ -113,14 +114,15 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void findByLoginAndPasswordTestFalse1() throws ServiceValidationException {
+    public void findByLoginAndPasswordTestFalseIfLoginNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validateLogin(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> userService.findByLoginAndPassword("f5g65&*&$#@@@@@", PASSWORD));
     }
 
     @Test
-    public void findByLoginAndPasswordTestFalse2() throws ServiceValidationException, ServiceSearchException {
+    public void findByLoginAndPasswordTestFalseIfUserNotFound()
+            throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateLogin(anyString());
         when(userDao.findByLogin(anyString())).thenReturn(null);
         doThrow(ServiceSearchException.class).when(validator)
@@ -139,14 +141,15 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void findByIdTestFalse1() throws ServiceValidationException {
+    public void findByIdTestFalseIfIdNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validateId(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> userService.findById("f5g"));
     }
 
     @Test
-    public void findByIdTestFalse2() throws ServiceValidationException, ServiceSearchException {
+    public void findByIdTestFalseIfUserNotFound()
+            throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(userDao.findById(anyLong())).thenReturn(Optional.empty());
         doThrow(ServiceSearchException.class).when(validator).validateUser(any(Optional.class), anyString());
@@ -169,7 +172,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void findAllTestFalse1() throws ServiceValidationException {
+    public void findAllTestFalseIfPageNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validatePage(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> userService.findAll("1", "10"));

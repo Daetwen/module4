@@ -30,7 +30,6 @@ public class TagServiceImplTest {
     private TagConverter tagConverter;
     private Validator validator;
     private Verifier verifier;
-    private LocaleManager localeManager;
     private TagDao tagDao;
     private TagDto tagDtoTest1;
     private Tag tagTest1;
@@ -41,7 +40,7 @@ public class TagServiceImplTest {
         tagConverter = mock(TagConverter.class);
         validator = mock(Validator.class);
         verifier = mock(Verifier.class);
-        localeManager = mock(LocaleManager.class);
+        LocaleManager localeManager = mock(LocaleManager.class);
         tagService = new TagServiceImpl(tagDao, validator, verifier, tagConverter, localeManager);
         tagDtoTest1 = new TagDto(5L, "Hello");
         tagTest1 = new Tag(5L, "Hello");
@@ -60,7 +59,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void createTestFalse1() throws ServiceSearchException {
+    public void createTestFalseIfTagNotValid() throws ServiceSearchException {
         when(verifier.isValidTag(any(TagDto.class))).thenReturn(false);
         doThrow(ServiceSearchException.class).when(validator).validateTag(nullable(Tag.class));
         assertThrows(ServiceSearchException.class,
@@ -68,7 +67,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void createTestFalse2() throws ServiceSearchException {
+    public void createTestFalseTagNotCreate() throws ServiceSearchException {
         when(verifier.isValidTag(any(TagDto.class))).thenReturn(true);
         when(tagConverter.convertTagDtoToTag(any(TagDto.class))).thenReturn(tagTest1);
         when(tagDao.save(any(Tag.class))).thenReturn(null);
@@ -88,14 +87,15 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findByIdTestFalse1() throws ServiceValidationException {
+    public void findByIdTestFalseIfIdNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validateId(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> tagService.findById("f5g"));
     }
 
     @Test
-    public void findByIdTestFalse2() throws ServiceSearchException, ServiceValidationException {
+    public void findByIdTestFalseIfTagNotFound()
+            throws ServiceSearchException, ServiceValidationException {
         doNothing().when(validator).validateId(anyString());
         when(tagDao.findById(anyLong())).thenReturn(Optional.empty());
         doThrow(ServiceSearchException.class).when(validator).validateTag(any(Optional.class));
@@ -114,14 +114,15 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findByNameTestFalse1() throws ServiceValidationException {
+    public void findByNameTestFalseIfNameNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validateName(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> tagService.findByName("New Year"));
     }
 
     @Test
-    public void findByNameTestFalse2() throws ServiceValidationException, ServiceSearchException {
+    public void findByNameTestFalseIfTagNotFound()
+            throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateName(anyString());
         when(tagDao.findByName(anyString())).thenReturn(Optional.empty());
         doThrow(ServiceSearchException.class).when(validator).validateTag(any(Optional.class));
@@ -143,7 +144,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findAllTestFalse1() throws ServiceValidationException {
+    public void findAllTestFalseIfPageNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validatePage(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> tagService.findAll("1", "10"));
@@ -159,7 +160,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findMostPopularTestFalse() throws ServiceSearchException {
+    public void findMostPopularTestFalseIfNoOneFound() throws ServiceSearchException {
         when(tagDao.findMostPopular()).thenReturn(null);
         doThrow(ServiceSearchException.class).when(validator).validateTag(nullable(Tag.class));
         assertThrows(ServiceSearchException.class,
@@ -179,14 +180,15 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void deleteByIdTestFalse1() throws ServiceValidationException {
+    public void deleteByIdTestFalseIfIdNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validateId(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> tagService.deleteById("5"));
     }
 
     @Test
-    public void deleteByIdTestFalse2() throws ServiceValidationException, ServiceSearchException {
+    public void deleteByIdTestFalseIfTagNotFound()
+            throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(tagDao.findById(anyLong())).thenReturn(Optional.empty());
         doThrow(ServiceSearchException.class).when(validator).validateTag(any(Optional.class));

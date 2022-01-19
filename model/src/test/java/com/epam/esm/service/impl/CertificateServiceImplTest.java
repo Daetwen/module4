@@ -93,7 +93,7 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void createTestFalse1() throws ServiceSearchException {
+    public void createTestFalseIfCertificateNotValid() throws ServiceSearchException {
         when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(false);
         doThrow(ServiceSearchException.class).when(validator).validateCertificate(nullable(Certificate.class));
         assertThrows(ServiceSearchException.class,
@@ -101,7 +101,7 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void createTestFalse2() throws ServiceSearchException {
+    public void createTestFalseIfCertificateIsNull() throws ServiceSearchException {
         when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
         when(certificateDao.save(any(Certificate.class))).thenReturn(null);
         doThrow(ServiceSearchException.class).when(validator).validateCertificate(nullable(Certificate.class));
@@ -122,14 +122,15 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void findByIdTestFalse1() throws ServiceValidationException {
+    public void findByIdTestFalseIfIdNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validateId(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> certificateService.findById("f5g"));
     }
 
     @Test
-    public void findByIdTestFalse2() throws ServiceValidationException, ServiceSearchException {
+    public void findByIdTestFalseIfCertificateNotFound()
+            throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(certificateDao.findById(anyLong())).thenReturn(Optional.empty());
         doThrow(ServiceSearchException.class).when(validator).validateCertificate(any(Optional.class));
@@ -165,7 +166,7 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void updateTestFalse1() throws ServiceSearchException {
+    public void updateTestFalseIfCertificateNotValid() throws ServiceSearchException {
         when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(false);
         doThrow(ServiceSearchException.class).when(validator).validateCertificate(any(Optional.class));
         assertThrows(ServiceSearchException.class,
@@ -173,7 +174,7 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void updateTestFalse2() throws ServiceSearchException {
+    public void updateTestFalseIfCertificateNotFound() throws ServiceSearchException {
         when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
         when(certificateDao.findById(anyLong())).thenReturn(Optional.empty());
         doThrow(ServiceSearchException.class).when(validator).validateCertificate(any(Optional.class));
@@ -182,7 +183,7 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void updateTestFalse3() throws ServiceSearchException {
+    public void updateTestFalseIfUpdateException() throws ServiceSearchException {
         when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
         when(certificateDao.findById(anyLong())).thenReturn(Optional.of(certificateTest1));
         when(certificateDao.save(any(Certificate.class))).thenReturn(null);
@@ -205,14 +206,15 @@ public class CertificateServiceImplTest {
     }
 
     @Test
-    public void deleteByIdTestFalse1() throws ServiceValidationException {
+    public void deleteByIdTestFalseIfIdNotValid() throws ServiceValidationException {
         doThrow(ServiceValidationException.class).when(validator).validateId(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> certificateService.deleteById("5"));
     }
 
     @Test
-    public void deleteByIdTestFalse2() throws ServiceValidationException, ServiceSearchException {
+    public void deleteByIdTestFalseIfCertificateNotFound()
+            throws ServiceValidationException, ServiceSearchException {
         doNothing().when(validator).validateId(anyString());
         when(certificateDao.findById(anyLong())).thenReturn(Optional.empty());
         doThrow(ServiceSearchException.class).when(validator).validateCertificate(any(Optional.class));
