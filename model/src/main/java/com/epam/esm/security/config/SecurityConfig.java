@@ -35,38 +35,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(
-                        CERTIFICATE_CREATE.toString(),
                         CERTIFICATE_GET.toString(),
                         CERTIFICATE_GET_ALL.toString(),
                         CERTIFICATE_GET_BY_PARAMETERS.toString(),
+                        ORDER_CREATE.toString(),
+                        ORDER_GET.toString(),
+                        ORDER_GET_ALL.toString(),
+                        ORDER_GET_BY_USER_ID.toString(),
+                        TAG_GET.toString(),
+                        TAG_GET_ALL.toString(),
+                        TAG_GET_MOST_POPULAR.toString(),
+                        USER_GET.toString(),
+                        USER_GET_ALL.toString()
+                ).hasAnyRole(ROLE_ADMIN, ROLE_USER)
+                .antMatchers(
+                        CERTIFICATE_CREATE.toString(),
                         CERTIFICATE_UPDATE.toString(),
                         CERTIFICATE_DELETE.toString(),
-                        ORDER_CREATE.toString(),
-                        ORDER_GET.toString(),
-                        ORDER_GET_ALL.toString(),
-                        ORDER_GET_BY_USER_ID.toString(),
                         TAG_CREATE.toString(),
-                        TAG_GET.toString(),
-                        TAG_GET_ALL.toString(),
-                        TAG_GET_MOST_POPULAR.toString(),
-                        TAG_DELETE.toString(),
-                        USER_GET.toString(),
-                        USER_GET_ALL.toString()
+                        TAG_DELETE.toString()
                 ).hasRole(ROLE_ADMIN)
-                .antMatchers(
-                        CERTIFICATE_GET.toString(),
-                        CERTIFICATE_GET_ALL.toString(),
-                        CERTIFICATE_GET_BY_PARAMETERS.toString(),
-                        ORDER_CREATE.toString(),
-                        ORDER_GET.toString(),
-                        ORDER_GET_ALL.toString(),
-                        ORDER_GET_BY_USER_ID.toString(),
-                        TAG_GET.toString(),
-                        TAG_GET_ALL.toString(),
-                        TAG_GET_MOST_POPULAR.toString(),
-                        USER_GET.toString(),
-                        USER_GET_ALL.toString()
-                ).hasRole(ROLE_USER)
                 .antMatchers(ALL_REGISTER.toString(), ALL_LOGIN.toString()).permitAll()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

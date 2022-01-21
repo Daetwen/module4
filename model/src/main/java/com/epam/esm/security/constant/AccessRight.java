@@ -7,7 +7,7 @@ public enum AccessRight {
     CERTIFICATE_CREATE("/certificates/create"),
     CERTIFICATE_GET("/certificates/get/*"),
     CERTIFICATE_GET_ALL("/certificates/get"),
-    CERTIFICATE_GET_BY_PARAMETERS("/certificates/get/certificate_parameter"),
+    CERTIFICATE_GET_BY_PARAMETERS("/certificates/get/certificate_parameters"),
     CERTIFICATE_UPDATE("/certificates/update"),
     CERTIFICATE_DELETE("/certificates/delete/*"),
 
