@@ -16,11 +16,11 @@ public enum AccessRight {
     ORDER_GET_ALL("/orders/get"),
     ORDER_GET_BY_USER_ID("/orders/get/user/*"),
 
-    TAG_CREATE("tags/create"),
-    TAG_GET("tags/get/tag"),
-    TAG_GET_ALL("tags/get"),
-    TAG_GET_MOST_POPULAR("/get/tag_most_popular"),
-    TAG_DELETE("tags/delete/*"),
+    TAG_CREATE("/tags/create"),
+    TAG_GET("/tags/get/tag"),
+    TAG_GET_ALL("/tags/get"),
+    TAG_GET_MOST_POPULAR("/tags/get/tag_most_popular"),
+    TAG_DELETE("/tags/delete/*"),
 
     USER_GET("/users/get/*"),
     USER_GET_ALL("/users/get");

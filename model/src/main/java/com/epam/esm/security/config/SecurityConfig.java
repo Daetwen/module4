@@ -1,6 +1,7 @@
 package com.epam.esm.security.config;
 
 import com.epam.esm.security.handler.CustomAccessDeniedHandler;
+import com.epam.esm.security.handler.CustomAuthenticationEntryPoint;
 import com.epam.esm.security.jwt.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -35,6 +37,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(
+                        CERTIFICATE_CREATE.toString(),
+                        CERTIFICATE_UPDATE.toString(),
+                        CERTIFICATE_DELETE.toString(),
+                        TAG_CREATE.toString(),
+                        TAG_DELETE.toString()
+                ).hasRole(ROLE_ADMIN)
+                .antMatchers(
                         CERTIFICATE_GET.toString(),
                         CERTIFICATE_GET_ALL.toString(),
                         CERTIFICATE_GET_BY_PARAMETERS.toString(),
@@ -48,21 +57,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         USER_GET.toString(),
                         USER_GET_ALL.toString()
                 ).hasAnyRole(ROLE_ADMIN, ROLE_USER)
-                .antMatchers(
-                        CERTIFICATE_CREATE.toString(),
-                        CERTIFICATE_UPDATE.toString(),
-                        CERTIFICATE_DELETE.toString(),
-                        TAG_CREATE.toString(),
-                        TAG_DELETE.toString()
-                ).hasRole(ROLE_ADMIN)
                 .antMatchers(ALL_REGISTER.toString(), ALL_LOGIN.toString()).permitAll()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling().accessDeniedHandler(accessDeniedHandler());
+                .exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler())
+                .authenticationEntryPoint(authenticationEntryPoint());
     }
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return new CustomAccessDeniedHandler();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint(){
+        return new CustomAuthenticationEntryPoint();
     }
 }
