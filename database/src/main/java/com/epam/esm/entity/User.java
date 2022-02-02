@@ -1,5 +1,8 @@
 package com.epam.esm.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -8,6 +11,9 @@ import java.util.List;
 
 @Entity
 @Audited
+@Builder
+@Getter
+@Setter
 @Table(name = "users")
 public class User {
 
@@ -46,75 +52,6 @@ public class User {
         this.password = password;
         this.orders = orders;
         this.role = role;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public List<Order> getOrders() {
-        List<Order> resultOrders = new ArrayList<>();
-        if (this.orders != null && !this.orders.isEmpty()) {
-            for (Order element : this.orders) {
-                Order order = new Order(element);
-                resultOrders.add(order);
-            }
-        }
-        return resultOrders;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public void setOrders(List<Order> orders) {
-        if (orders != null) {
-            this.orders = new ArrayList<>();
-            for (Order element : orders) {
-                Order order = new Order(element);
-                this.orders.add(order);
-            }
-        }
     }
 
     @Override

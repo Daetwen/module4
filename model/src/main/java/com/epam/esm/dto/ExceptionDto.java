@@ -1,7 +1,12 @@
 package com.epam.esm.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Objects;
 
+@Getter
+@Setter
 public class ExceptionDto {
 
     private String errorMessage;
@@ -11,22 +16,6 @@ public class ExceptionDto {
 
     public ExceptionDto(String errorMessage, long errorCode) {
         this.errorMessage = errorMessage;
-        this.errorCode = errorCode;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-
-    public long getErrorCode() {
-        return errorCode;
-    }
-
-    public void setErrorCode(long errorCode) {
         this.errorCode = errorCode;
     }
 

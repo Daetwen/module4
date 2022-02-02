@@ -1,5 +1,8 @@
 package com.epam.esm.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -8,6 +11,9 @@ import java.util.List;
 
 @Entity
 @Audited
+@Builder
+@Getter
+@Setter
 @Table(name = "tags")
 public class Tag {
 
@@ -32,22 +38,6 @@ public class Tag {
     public Tag(Tag tag) {
         this.id = tag.getId();
         this.name = tag.getName();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

@@ -1,5 +1,8 @@
 package com.epam.esm.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -8,6 +11,9 @@ import java.time.OffsetDateTime;
 
 @Entity
 @Audited
+@Builder
+@Getter
+@Setter
 @Table(name = "orders")
 public class Order {
 
@@ -46,46 +52,6 @@ public class Order {
         this.createDate = order.getCreateDate();
         this.user = order.getUser();
         this.certificate = order.getCertificate();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public OffsetDateTime getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(OffsetDateTime createDate) {
-        this.createDate = createDate;
-    }
-
-    public Certificate getCertificate() {
-        return new Certificate(certificate);
-    }
-
-    public void setCertificate(Certificate certificate) {
-        this.certificate = new Certificate(certificate);
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     @Override

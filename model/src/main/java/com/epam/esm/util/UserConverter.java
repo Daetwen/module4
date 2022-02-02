@@ -1,7 +1,5 @@
 package com.epam.esm.util;
 
-import com.epam.esm.builder.UserBuilder;
-import com.epam.esm.builder.UserDtoBuilder;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.Role;
 import com.epam.esm.entity.User;
@@ -11,34 +9,33 @@ import org.springframework.stereotype.Component;
 public class UserConverter {
 
     public UserDto convertUserToUserDto(User user) {
-        UserDtoBuilder userDtoBuilder = setCommonUserDtoBuilderParameters(user);
-        return userDtoBuilder.build();
+        return setCommonUserDtoBuilderParameters(user);
     }
 
     public UserDto convertUserToUserDtoWithPassword(User user) {
-        UserDtoBuilder userDtoBuilder = setCommonUserDtoBuilderParameters(user);
-        userDtoBuilder.setPassword(user.getPassword());
-        return userDtoBuilder.build();
+        UserDto userDto = setCommonUserDtoBuilderParameters(user);
+        userDto.setPassword(user.getPassword());
+        return userDto;
     }
 
     public User convertUserDtoToUser(UserDto userDto) {
-        UserBuilder userBuilder = new UserBuilder();
-        userBuilder.setId(userDto.getId());
-        userBuilder.setName(userDto.getName());
-        userBuilder.setSurname(userDto.getSurname());
-        userBuilder.setLogin(userDto.getLogin());
-        userBuilder.setPassword(userDto.getPassword());
-        userBuilder.setRole(new Role(userDto.getRole()));
-        return userBuilder.build();
+        return User.builder()
+                .id(userDto.getId())
+                .name(userDto.getName())
+                .surname(userDto.getSurname())
+                .login(userDto.getLogin())
+                .password(userDto.getPassword())
+                .role(new Role(userDto.getRole()))
+                .build();
     }
 
-    private UserDtoBuilder setCommonUserDtoBuilderParameters(User user) {
-        UserDtoBuilder userDtoBuilder = new UserDtoBuilder();
-        userDtoBuilder.setId(user.getId());
-        userDtoBuilder.setName(user.getName());
-        userDtoBuilder.setSurname(user.getSurname());
-        userDtoBuilder.setLogin(user.getLogin());
-        userDtoBuilder.setRole(user.getRole().getName());
-        return userDtoBuilder;
+    private UserDto setCommonUserDtoBuilderParameters(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .surname(user.getSurname())
+                .login(user.getLogin())
+                .role(user.getRole().getName())
+                .build();
     }
 }

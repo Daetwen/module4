@@ -1,8 +1,15 @@
 package com.epam.esm.dto;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+@Builder
+@Getter
+@Setter
 public class OrderDto {
 
     private Long id;
@@ -18,46 +25,6 @@ public class OrderDto {
         this.price = price;
         this.createDate = createDate;
         this.user = user;
-        this.certificate = certificate;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public OffsetDateTime getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(OffsetDateTime createDate) {
-        this.createDate = createDate;
-    }
-
-    public UserDto getUser() {
-        return user;
-    }
-
-    public void setUser(UserDto user) {
-        this.user = user;
-    }
-
-    public CertificateDto getCertificate() {
-        return certificate;
-    }
-
-    public void setCertificate(CertificateDto certificate) {
         this.certificate = certificate;
     }
 

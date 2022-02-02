@@ -1,5 +1,8 @@
 package com.epam.esm.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -8,6 +11,9 @@ import java.util.List;
 
 @Entity
 @Audited
+@Builder
+@Getter
+@Setter
 @Table(name = "roles")
 public class Role {
 
@@ -24,6 +30,11 @@ public class Role {
 
     public Role() {}
 
+    public Role(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Role(String name) {
         this.name = name;
         switch (name.toUpperCase()) {
@@ -36,22 +47,6 @@ public class Role {
     public Role(Role role) {
         this.id = role.getId();
         this.name = role.getName();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

@@ -1,5 +1,8 @@
 package com.epam.esm.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -12,6 +15,9 @@ import java.util.Objects;
 
 @Entity
 @Audited
+@Builder
+@Getter
+@Setter
 @Table(name = "gift_certificates")
 public class Certificate {
 
@@ -82,83 +88,6 @@ public class Certificate {
         this.tags = new ArrayList<>();
         if (certificate.getTags() != null && !certificate.getTags().isEmpty()) {
             for (Tag element : certificate.getTags()) {
-                Tag tag = new Tag(element);
-                this.tags.add(tag);
-            }
-        }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public OffsetDateTime getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(OffsetDateTime createDate) {
-        this.createDate = createDate;
-    }
-
-    public OffsetDateTime getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(OffsetDateTime lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
-
-    public List<Tag> getTags() {
-        List<Tag> resultTags = new ArrayList<>();
-        if (this.tags != null) {
-            for (Tag value : this.tags) {
-                Tag tag = new Tag(value);
-                resultTags.add(tag);
-            }
-        }
-        return resultTags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        if (tags != null) {
-            this.tags = new ArrayList<>();
-            for (Tag element : tags) {
                 Tag tag = new Tag(element);
                 this.tags.add(tag);
             }

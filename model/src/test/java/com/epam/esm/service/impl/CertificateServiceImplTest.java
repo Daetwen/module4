@@ -1,7 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.builder.CertificateBuilder;
-import com.epam.esm.builder.CertificateDtoBuilder;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.CertificateDto;
@@ -55,26 +53,26 @@ public class CertificateServiceImplTest {
         tagDtoList.add(tagDtoTest1);
         tagList.add(tagTest1);
 
-        CertificateDtoBuilder certificateDtoBuilder = new CertificateDtoBuilder();
-        certificateDtoBuilder.setId(2L);
-        certificateDtoBuilder.setName("Name");
-        certificateDtoBuilder.setDescription("Description");
-        certificateDtoBuilder.setPrice(new BigDecimal(5000));
-        certificateDtoBuilder.setDuration(100);
-        certificateDtoBuilder.setCreateDate(OffsetDateTime.parse("2021-11-20T21:30:19+03:00"));
-        certificateDtoBuilder.setLastUpdateDate(OffsetDateTime.parse("2021-11-22T21:25:37+03:00"));
-        certificateDtoTest1 = certificateDtoBuilder.build();
+        certificateDtoTest1 = CertificateDto.builder()
+                .id(2L)
+                .name("Name")
+                .description("Description")
+                .price(new BigDecimal(5000))
+                .duration(100)
+                .createDate(OffsetDateTime.parse("2021-11-20T21:30:19+03:00"))
+                .lastUpdateDate(OffsetDateTime.parse("2021-11-22T21:25:37+03:00"))
+                .build();
         certificateDtoTest1.setTags(tagDtoList);
 
-        CertificateBuilder certificateBuilder = new CertificateBuilder();
-        certificateBuilder.setId(2L);
-        certificateBuilder.setName("Name");
-        certificateBuilder.setDescription("Description");
-        certificateBuilder.setPrice(new BigDecimal(5000));
-        certificateBuilder.setDuration(100);
-        certificateBuilder.setCreateDate(OffsetDateTime.parse("2021-11-20T21:30:19+03:00"));
-        certificateBuilder.setLastUpdateDate(OffsetDateTime.parse("2021-11-22T21:25:37+03:00"));
-        certificateTest1 = certificateBuilder.build();
+        certificateTest1 = Certificate.builder()
+                .id(2L)
+                .name("Name")
+                .description("Description")
+                .price(new BigDecimal(5000))
+                .duration(100)
+                .createDate(OffsetDateTime.parse("2021-11-20T21:30:19+03:00"))
+                .lastUpdateDate(OffsetDateTime.parse("2021-11-22T21:25:37+03:00"))
+                .build();
         certificateTest1.setTags(tagList);
     }
 
