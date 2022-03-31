@@ -2,6 +2,7 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.constant.LanguagePath;
 import com.epam.esm.dao.UserDao;
+import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ServiceSearchException;
@@ -58,6 +59,7 @@ public class UserServiceImpl implements UserService {
     public UserDto findByLoginAndPassword(String login, String password)
             throws ServiceSearchException, ServiceValidationException {
         validator.validateLogin(login);
+        validator.validatePassword(password);
         User user = userDao.findByLogin(login);
         validator.validateUser(user, password, LanguagePath.ERROR_NOT_FOUND_BY_LOGIN_AND_PASSWORD);
         return userConverter.convertUserToUserDto(user);

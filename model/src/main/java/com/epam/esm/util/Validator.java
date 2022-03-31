@@ -19,6 +19,7 @@ import java.util.Optional;
 public class Validator {
     private static final String ID_REGEX = "\\d+";
     private static final String NAME_REGEX = "[\\w !?,.]{0,45}";
+    private static final String PASSWORD_REGEX = "[\\w_!?#]{0,40}";
 
     private final LocaleManager localeManager;
     private final Encoder passwordEncoder;
@@ -50,6 +51,13 @@ public class Validator {
 
     public void validateLogin(String login) throws ServiceValidationException {
         validateName(login);
+    }
+
+    public void validatePassword(String password) throws ServiceValidationException {
+        if (StringUtils.isBlank(password) || !password.matches(PASSWORD_REGEX)) {
+            throw new ServiceValidationException(
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_VALIDATION));
+        }
     }
 
     public void validateCertificate(Optional<Certificate> certificate)

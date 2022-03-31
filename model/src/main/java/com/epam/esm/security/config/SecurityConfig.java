@@ -12,10 +12,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import static com.epam.esm.security.constant.AccessRight.*;
 
 @EnableWebSecurity
+@CrossOrigin(origins = "${angular.origin.url}")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String ROLE_ADMIN = "ADMIN";
@@ -31,6 +33,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .cors()
+                .and()
                 .httpBasic().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -49,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         CERTIFICATE_GET_BY_PARAMETERS.toString(),
                         ORDER_CREATE.toString(),
                         ORDER_GET.toString(),
+                        ORDER_GET_FOR_USER.toString(),
                         ORDER_GET_ALL.toString(),
                         ORDER_GET_BY_USER_ID.toString(),
                         TAG_GET.toString(),
@@ -57,7 +62,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         USER_GET.toString(),
                         USER_GET_ALL.toString()
                 ).hasAnyRole(ROLE_ADMIN, ROLE_USER)
-                .antMatchers(ALL_REGISTER.toString(), ALL_LOGIN.toString()).permitAll()
+                .antMatchers(
+                        ALL_REGISTER.toString(),
+                        ALL_LOGIN.toString()).permitAll()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()

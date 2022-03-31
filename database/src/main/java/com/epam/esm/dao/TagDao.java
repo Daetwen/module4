@@ -54,7 +54,7 @@ public interface TagDao extends JpaRepository<Tag, Long> {
      * @param pageable parameters for pagination
      * @return the page of all tags in the database
      */
-    Page<Tag> findAll(Pageable pageable);
+    Page<Tag> findAllByOrderByIdDesc(Pageable pageable);
 
     /**
      * Find count of tag records.

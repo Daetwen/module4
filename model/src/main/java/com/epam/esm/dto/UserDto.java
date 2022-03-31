@@ -15,24 +15,29 @@ public class UserDto {
     private String login;
     private String password;
     private String role;
+    private String photoRef;
 
     public UserDto() {}
 
-    public UserDto(Long id, String name, String surname, String login, String role) {
+    public UserDto(Long id, String name, String surname,
+                   String login, String role, String photoRef) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.login = login;
         this.role = role;
+        this.photoRef = photoRef;
     }
 
-    public UserDto(Long id, String name, String surname, String login, String password, String role) {
+    public UserDto(Long id, String name, String surname, String login,
+                   String password, String role, String photoRef) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.login = login;
         this.password = password;
         this.role = role;
+        this.photoRef = photoRef;
     }
 
     @Override
@@ -48,7 +53,8 @@ public class UserDto {
                 name.equals(userDto.name) &&
                 surname.equals(userDto.surname) &&
                 login.equals(userDto.login) &&
-                role.equals(userDto.role);
+                role.equals(userDto.role) &&
+                photoRef.equals(userDto.photoRef);
     }
 
     @Override
@@ -61,6 +67,7 @@ public class UserDto {
         result = result * prime + (surname != null ? surname.hashCode() : 0);
         result = result * prime + (login != null ? login.hashCode() : 0);
         result = result * prime + (role != null ? role.hashCode() : 0);
+        result = result * prime + (photoRef != null ? photoRef.hashCode() : 0);
         return result;
     }
 
@@ -72,7 +79,8 @@ public class UserDto {
                 .append(", name = '").append(name).append('\'')
                 .append(", surname = '").append(surname).append('\'')
                 .append(", login = '").append(login).append('\'')
-                .append(", role = '").append(role).append('\'');
+                .append(", role = '").append(role).append('\'')
+                .append(", photoRef = '").append(photoRef).append('\'');
         return stringBuilder.toString();
     }
 }

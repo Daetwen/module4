@@ -22,11 +22,12 @@ public class JwtProvider {
     @Value("${jwt.token.ttl}")
     private Long timeToLive;
 
-    public  String generateToken(String login) {
+    public String generateToken(String login, Long id) {
         LocalDateTime currentTime = LocalDateTime.now(ZoneId.systemDefault());
         Date date = Date.from(currentTime.plusHours(timeToLive).toInstant(ZoneOffset.UTC));
         return Jwts.builder()
                 .setSubject(login)
+                .setId(id.toString())
                 .setExpiration(date)
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();

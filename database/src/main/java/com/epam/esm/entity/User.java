@@ -41,10 +41,13 @@ public class User {
     @JoinColumn(name = "roles_id")
     private Role role;
 
+    @Column(name = "photo_ref")
+    private String photoRef;
+
     public User() {}
 
     public User(Long id, String name, String surname, String login,
-                String password, List<Order> orders, Role role) {
+                String password, List<Order> orders, Role role, String photoRef) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -52,6 +55,7 @@ public class User {
         this.password = password;
         this.orders = orders;
         this.role = role;
+        this.photoRef = photoRef;
     }
 
     @Override
@@ -69,7 +73,8 @@ public class User {
                 login.equals(user.login) &&
                 password.equals(user.password) &&
                 orders.equals(user.orders) &&
-                role.equals(user.role);
+                role.equals(user.role) &&
+                photoRef.equals(user.photoRef);
     }
 
     @Override
@@ -84,6 +89,7 @@ public class User {
         result = result * prime + (password != null ? password.hashCode() : 0);
         result = result * prime + (orders != null ? orders.hashCode() : 0);
         result = result * prime + (role != null ? role.hashCode() : 0);
+        result = result * prime + (photoRef != null ? photoRef.hashCode() : 0);
         return result;
     }
 
@@ -96,7 +102,8 @@ public class User {
                 .append(", surname = '").append(surname).append('\'')
                 .append(", login = '").append(login).append('\'')
                 .append(", password = '").append(password).append('\'')
-                .append(", role = '").append(role).append('\'');
+                .append(", role = '").append(role).append('\'')
+                .append(",photoRef = '").append(photoRef).append('\'');
         stringBuilder.append(", orders = [");
         for(Order order : this.orders) {
             stringBuilder.append(order).append(", ");

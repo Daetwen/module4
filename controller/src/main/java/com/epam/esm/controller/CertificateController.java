@@ -6,28 +6,22 @@ import com.epam.esm.exception.ServiceValidationException;
 import com.epam.esm.hateoas.CertificateResource;
 import com.epam.esm.hateoas.Resource;
 import com.epam.esm.service.CertificateService;
-import static com.epam.esm.constant.PaginationParameter.DEFAULT_PAGE;
-import static com.epam.esm.constant.PaginationParameter.DEFAULT_PAGE_SIZE;
 
 import com.epam.esm.util.ParameterName;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.epam.esm.constant.PaginationParameter.*;
+
 @RestController
 @RequestMapping("/certificates")
+@CrossOrigin(origins = "${angular.origin.url}")
 public class CertificateController {
 
     private static final String DELIMITER = "#";
@@ -51,7 +45,7 @@ public class CertificateController {
     @ResponseStatus(HttpStatus.OK)
     public Resource<List<Resource<CertificateDto>>> getAll(
             @RequestParam(value = "page", required = false, defaultValue = DEFAULT_PAGE) String page,
-            @RequestParam(value = "pageSize", required = false, defaultValue = DEFAULT_PAGE_SIZE) String pageSize)
+            @RequestParam(value = "pageSize", required = false, defaultValue = DEFAULT_PAGE_SIZE_CERTIFICATES) String pageSize)
             throws ServiceValidationException, ServiceSearchException {
         return certificateResource.getAll(certificateService.findAll(page, pageSize), page, pageSize);
     }
@@ -70,7 +64,7 @@ public class CertificateController {
             @RequestParam(value = "part", required = false) String part,
             @RequestParam(value = "sort", required = false) String sort,
             @RequestParam(value = "page", required = false, defaultValue = DEFAULT_PAGE) String page,
-            @RequestParam(value = "pageSize", required = false, defaultValue = DEFAULT_PAGE_SIZE) String pageSize)
+            @RequestParam(value = "pageSize", required = false, defaultValue = DEFAULT_PAGE_SIZE_CERTIFICATES) String pageSize)
             throws ServiceValidationException, ServiceSearchException {
         Map<String, String> parameters = new HashMap<>();
         collectParametersForList(parameters, ParameterName.TAG_NAME, tagNames);

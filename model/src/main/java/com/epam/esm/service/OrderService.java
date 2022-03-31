@@ -33,6 +33,17 @@ public interface OrderService {
     OrderDto findById(String id) throws ServiceSearchException, ServiceValidationException;
 
     /**
+     * Find order by order id and user id.
+     *
+     * @param orderId the order id
+     *  @param userId the user id
+     * @return the result order dto
+     * @throws ServiceSearchException     the service search exception
+     * @throws ServiceValidationException the service validation exception
+     */
+    OrderDto findByIdAndUserId(String orderId, String userId) throws ServiceSearchException, ServiceValidationException;
+
+    /**
      * Find all orders list.
      *
      * @param page     the current page

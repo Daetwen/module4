@@ -16,9 +16,18 @@ public interface OrderDao extends JpaRepository<Order, Long> {
      * Find by id one order.
      *
      * @param id the id for search
-     * @return the result of search
+     * @return the optional result of search
      */
     Optional<Order> findById(Long id);
+
+    /**
+     * Find by order id and user id one order.
+     *
+     * @param orderId the order id
+     * @param userId  the user id
+     * @return the optional result of search
+     */
+    Optional<Order> findByIdAndUserId(Long orderId, Long userId);
 
     /**
      * Find all orders.

@@ -13,6 +13,7 @@ public enum AccessRight {
 
     ORDER_CREATE("/orders/create"),
     ORDER_GET("/orders/get/*"),
+    ORDER_GET_FOR_USER("/orders/get/personal"),
     ORDER_GET_ALL("/orders/get"),
     ORDER_GET_BY_USER_ID("/orders/get/user/*"),
 

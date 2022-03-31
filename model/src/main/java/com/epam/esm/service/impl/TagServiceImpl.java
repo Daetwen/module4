@@ -73,7 +73,7 @@ public class TagServiceImpl implements TagService {
         validator.validatePage(pageSize);
         List<TagDto> tagDtoList = new ArrayList<>();
         if (Integer.parseInt(page) <= getCountOfPages(pageSize)) {
-            for (Tag element : tagDao.findAll(
+            for (Tag element : tagDao.findAllByOrderByIdDesc(
                     PageRequest.of(Integer.parseInt(page) - 1, Integer.parseInt(pageSize)))) {
                 tagDtoList.add(tagConverter.convertTagToTagDto(element));
             }

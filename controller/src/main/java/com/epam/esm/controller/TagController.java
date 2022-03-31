@@ -8,26 +8,20 @@ import com.epam.esm.hateoas.Resource;
 import com.epam.esm.hateoas.TagResource;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.ControllerValidator;
-import static com.epam.esm.constant.PaginationParameter.DEFAULT_PAGE;
-import static com.epam.esm.constant.PaginationParameter.DEFAULT_PAGE_SIZE;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.epam.esm.constant.PaginationParameter.*;
+
 @RestController
 @RequestMapping("/tags")
+@CrossOrigin(origins = "${angular.origin.url}")
 public class TagController {
 
     private final TagService tagService;
@@ -52,7 +46,7 @@ public class TagController {
     @ResponseStatus(HttpStatus.OK)
     public Resource<List<Resource<TagDto>>> getAll(
             @RequestParam(value = "page", required = false, defaultValue = DEFAULT_PAGE) String page,
-            @RequestParam(value = "pageSize", required = false, defaultValue = DEFAULT_PAGE_SIZE) String pageSize)
+            @RequestParam(value = "pageSize", required = false, defaultValue = DEFAULT_PAGE_SIZE_TAGS) String pageSize)
             throws ServiceValidationException, ServiceSearchException, ControllerException {
         return tagResource.getAll(tagService.findAll(page, pageSize), page, pageSize);
     }

@@ -26,6 +26,7 @@ public class UserConverter {
                 .login(userDto.getLogin())
                 .password(userDto.getPassword())
                 .role(new Role(userDto.getRole()))
+                .photoRef(userDto.getPhotoRef())
                 .build();
     }
 
@@ -36,6 +37,7 @@ public class UserConverter {
                 .surname(user.getSurname())
                 .login(user.getLogin())
                 .role(user.getRole().getName())
+                .photoRef(user.getPhotoRef())
                 .build();
     }
 }

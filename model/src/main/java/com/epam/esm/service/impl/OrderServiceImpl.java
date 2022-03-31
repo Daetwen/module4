@@ -67,9 +67,21 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto findById(String id) throws ServiceSearchException, ServiceValidationException {
+    public OrderDto findById(String id)
+            throws ServiceSearchException, ServiceValidationException {
         validator.validateId(id);
         Optional<Order> result = orderDao.findById(Long.parseLong(id));
+        validator.validateOrder(result);
+        return orderConverter.convertOrderToOrderDto(result.get());
+    }
+
+    @Override
+    public OrderDto findByIdAndUserId(String orderId, String userId)
+            throws ServiceSearchException, ServiceValidationException {
+        validator.validateId(orderId);
+        validator.validateId(userId);
+        Optional<Order> result = orderDao.findByIdAndUserId(
+                Long.parseLong(orderId), Long.parseLong(userId));
         validator.validateOrder(result);
         return orderConverter.convertOrderToOrderDto(result.get());
     }
@@ -81,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
         validator.validatePage(pageSize);
         List<OrderDto> orderDtoList = new ArrayList<>();
         if (Integer.parseInt(page) <= getCountOfPages(pageSize)) {
-            for (Order element : orderDao.findAll(PageRequest.of(Integer.parseInt(page), Integer.parseInt(pageSize)))) {
+            for (Order element : orderDao.findAll(PageRequest.of(Integer.parseInt(page) - 1, Integer.parseInt(pageSize)))) {
                 orderDtoList.add(orderConverter.convertOrderToOrderDto(element));
             }
         }
@@ -97,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDto> orderDtoList = new ArrayList<>();
         if (Integer.parseInt(page) <= getCountOfPagesOfUserOrders(userId, pageSize)) {
             Page<Order> resultOrders = orderDao.findByUserId(Long.parseLong(userId), PageRequest.of(
-                    Integer.parseInt(page),
+                    Integer.parseInt(page) - 1,
                     Integer.parseInt(pageSize)));
             for (Order element : resultOrders) {
                 orderDtoList.add(orderConverter.convertOrderToOrderDto(element));

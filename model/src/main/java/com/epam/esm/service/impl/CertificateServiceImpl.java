@@ -181,7 +181,8 @@ public class CertificateServiceImpl implements CertificateService {
         List<String> tagList = new ArrayList<>();
         int countOfTags = 0;
         while (countOfTags < parameters.size()) {
-            if (parameters.containsKey(ParameterName.TAG_NAME.name() + DELIMITER + countOfTags)) {
+            if (parameters.containsKey(ParameterName.TAG_NAME.name() + DELIMITER + countOfTags)
+                    && verifier.isValidName(parameters.get(ParameterName.TAG_NAME.name() + DELIMITER + countOfTags))) {
                 tagList.add(parameters.get(ParameterName.TAG_NAME.name() + DELIMITER + countOfTags));
             } else {
                 break;
@@ -193,7 +194,8 @@ public class CertificateServiceImpl implements CertificateService {
 
     private String createParameterForSearchByPart(Map<String, String> parameters) {
         StringBuilder result = new StringBuilder();
-        if (parameters.containsKey(ParameterName.NAME_OR_DESC_PART.name())) {
+        if (parameters.containsKey(ParameterName.NAME_OR_DESC_PART.name())
+                && verifier.isValidName(parameters.get(ParameterName.NAME_OR_DESC_PART.name()))) {
             result.append("%").append(parameters.get(ParameterName.NAME_OR_DESC_PART.name())).append("%");
         }
         return result.toString();
@@ -202,7 +204,7 @@ public class CertificateServiceImpl implements CertificateService {
     private Pageable createParameterForPaginationAndSort(
             Integer page, Integer pageSize,
             Map<String, String> parameters) {
-        Pageable result = null;
+        Pageable result;
         if (parameters.containsKey(ParameterName.SORT.name())) {
             switch (parameters.get(ParameterName.SORT.name()).toLowerCase()) {
                 case "asc": {
@@ -215,6 +217,8 @@ public class CertificateServiceImpl implements CertificateService {
                 }
                 default: result = PageRequest.of(page - 1, pageSize);
             }
+        } else {
+            result = PageRequest.of(page - 1, pageSize);
         }
         return result;
     }
